@@ -27,11 +27,24 @@ object MutableGraph {
 class MutableGraph(val source: Node, val target: Node) {
 
   val neighboursMap: HashMap[Int, Set[Node]] = HashMap()
-  val edgesMap: HashMap[(Int, Int), Edge] = HashMap() // TODO: multiple edges
+  val edgesMap: HashMap[(Int, Int), Set[Edge]] = HashMap()
 
   def addEdge(e: Edge) = {
-    edgesMap put ((e.from, e.to), e)
+    updateEdgesMap(e)
+    updateNeighboursMap(e)
+  }
 
+  private def updateEdgesMap(e: Edge) = {
+    val key = (e.from, e.to)
+    if (!(edgesMap contains key)) {
+      val edgesSet: Set[Edge] = new HashSet
+      edgesMap put (key, edgesSet)
+    }
+
+    (edgesMap get key) match { case Some(s) => s += e }
+  }
+
+  private def updateNeighboursMap(e: Edge) = {
     if (!(neighboursMap contains e.from)) {
       val toSet: Set[Node] = new HashSet
       neighboursMap put (e.from, toSet)
@@ -39,13 +52,12 @@ class MutableGraph(val source: Node, val target: Node) {
 
     val toNode: Node = if (e.to == target.index) target else new Node(e.to)
     neighboursMap get e.from match { case Some(s) => s += toNode }
-
   }
 
   def nextNodes(n: Int): Option[Set[Node]] = neighboursMap get n
-  def getEdge(from: Int, to: Int): Edge = edgesMap get (from, to) match {
-    case Some(e) => e
-    case None => throw new IllegalArgumentException("Edge not found: ${from} -> ${to}")
+  def getEdges(from: Int, to: Int): Set[Edge] = edgesMap get (from, to) match {
+    case Some(s) => s
+    case None => throw new IllegalArgumentException("Edges not found: ${from} -> ${to}")
   }
 }
 

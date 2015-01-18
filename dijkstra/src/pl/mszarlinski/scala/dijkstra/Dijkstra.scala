@@ -19,7 +19,7 @@ object Dijkstra extends App {
     queue += graph.source
 
     while (!queue.isEmpty) {
-      processNode(queue.dequeue, graph, queue) //TODO: implicit params
+      processNode(queue.dequeue, graph, queue)
     }
 
     graph.target.weight
@@ -30,9 +30,8 @@ object Dijkstra extends App {
     for {
       set <- graph.nextNodes(node.index)
       u <- set
+      e <- graph.getEdges(node.index, u.index)
     } {
-      val e = graph.getEdge(node.index, u.index)
-
       val newWeight = node.weight + e.weight
       if (u.weight == -1 || u.weight > newWeight) {
         u.weight = newWeight
@@ -47,5 +46,8 @@ object Dijkstra extends App {
   }
 
   println(solution(Array(0, 0, 1, 1, 2), Array(1, 2, 2, 3, 3), Array(1, 3, 1, 3, 1), 0, 3))
+  // multiple edges
+  println(solution(Array(0, 0, 1, 1, 2, 2), Array(1, 2, 2, 3, 3, 3), Array(1, 3, 1, 3, 1, 10), 0, 3))
+  // negative weight
   println(solution(Array(0, 0, 1, 1, 2), Array(1, 2, 2, 3, 3), Array(1, 1, 1, 1, -1), 0, 3))
 }
